@@ -4,7 +4,7 @@ from typing import Final
 
 TOKEN: Final = '7526814127:AAFIwlc7LZPQ3Aid6CtDk1pRVH15fdtccN4'
 BOT_USERNAME = '@WKU_delivery_services_bot'
-
+WEBHOOK_URL = "https://telegram-bot.up.railway.app"
 # Define states for conversation flow
 PHONE_NUMBER, ORDER_DETAILS = range(2)
 
@@ -31,7 +31,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "1.6 Delivery from gubure totot\n"
         "1.7 Delivery from gebi sebele (ማሚ)\n"
         "2. ለ Delivery from A.A\n"
-        "3. ለ Wash close"
+        "3. ለ laundry"
     )
 
 
@@ -128,10 +128,26 @@ order_handler = ConversationHandler(
     fallbacks=[CommandHandler("cancel", cancel)],
 )
 
+async def set_webhook():
+    await app.bot.set_webhook(WEBHOOK_URL)
+
 # Command handlers
 app.add_handler(CommandHandler("start", start))
 app.add_handler(order_handler)
 app.add_handler(CommandHandler("track_order", track_order))
 app.add_handler(CommandHandler("orders", orders_list))  # Admin command
 print("🤖 Bot is running...")
-app.run_polling()
+
+async def main():
+    await set_webhook()  # Set the webhook URL for the bot to receive updates.
+
+    # Now run the webhook instead of polling
+    app.run_webhook(
+        listen="0.0.0.0",  # Listen on all available network interfaces
+        port=5000,          # Use port 5000 (standard for web apps)
+        webhook_url=WEBHOOK_URL,  # Provide the URL to receive updates
+    )
+
+if __name__ == "__main__":
+    import asyncio
+app.run_webhook())
